@@ -13,6 +13,13 @@ Software versioning:
 npm install -g bower
 ```
 
+### Stuff used
+- bower (as package manager)
+- gulp (boring tasks automatization)
+  - gulp-inject (used to inject our application css/js files automatically on "index.html")
+  - wiredep (used to inject our bower_components css/js files automatically)
+
+
 ### Step-by-step guide
 
 #### Starting point
