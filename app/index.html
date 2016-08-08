@@ -3,8 +3,27 @@
   <head>
     <meta charset="utf-8">
     <title></title>
+    <!-- "wiredep-inject" task: -->
+    <!-- bower:css -->
+    <link rel="stylesheet" href="bower_components/bootstrap-css/css/bootstrap.min.css" />
+    <!-- endbower -->
+
+    <!-- "gulp-inject" task: -->
+    <!-- inject:css -->
+    <link rel="stylesheet" href="/app/styles/test.css">
+    <!-- endinject -->
   </head>
   <body>
+    <!-- "wiredep-inject" task: -->
+    <!-- bower:js -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="bower_components/bootstrap-css/js/bootstrap.min.js"></script>
+    <!-- endbower -->
 
+    <!-- "gulp-inject" task: -->
+    <!-- inject:js -->
+    <script src="/app/scripts/test.js"></script>
+    <!-- endinject -->
   </body>
 </html>

@@ -59,6 +59,7 @@ echo "app/bower_components/" >> .gitignore
 3. Add **bootstrap** and **jQuery** with bower
 ```sh
 bower install bootstrap --save
+bower install bootstrap-css --save
 bower install jquery --save
 ```
 
@@ -71,6 +72,33 @@ git add .
 git commit -m "Repo init: set up bower and the starting point for the application."
 git push
 ```
+
+#### The first html page
+Create a "styles" and "scripts" folder under "app/" folder
+```sh
+mkdir app/styles
+mkdir app/scripts
+```
+
+Create the first html page on the "app/" folder
+```sh
+touch app/index.html
+```
+
+Add the following boilerplate content to it:
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+  </body>
+</html>
+```
+> ***ATOM-TIP***: When using Atom, type "html"(without quotation marks) and press tab
 
 #### Set up Gulp.js
 > TODO: what is gulp.js
@@ -158,31 +186,205 @@ grunt serve
 ```
 > To test it, open the "index.html" and type anything on the "<body></body>" tag! :)
 
-#### Writing
+#### Writing the "gulp-inject" task
+> No more need to add your "css, js ..." dependencies manually. Gulp does it for you.
+> https://github.com/klei/gulp-inject
 
-#### The first html page
-Create a "styles" and "scripts" folder under "app/" folder
+Install it as a development dependency
 ```sh
-mkdir app/styles
-mkdir app/scripts
+npm install --save-dev gulp-inject
 ```
 
-Create the first html page on the "app/" folder
-```sh
-touch app/index.html
-```
+Add those "injection placeholders" on your html
+```html
+<!-- inject:css -->
+<!-- endinject -->
 
-Add the following boilerplate content to it:
+<!-- inject:js -->
+<!-- endinject -->
+```
+This way
 ```html
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
     <title></title>
+    <!-- inject:css -->
+    <!-- endinject -->
   </head>
   <body>
 
+  <!-- inject:js -->
+  <!-- endinject -->
   </body>
 </html>
 ```
-> ***ATOM-TIP***: When using Atom, type "html"(without quotation marks) and press tab
+
+Open the "gulpfile.js" and add the "gulp-inject" task(by the way, it can be whatever the name you want)
+```js
+var inject = require('gulp-inject');
+
+gulp.task('gulp-inject', function () {
+  var target = gulp.src('./app/index.html');
+  // It's not necessary to read the files (will speed up things), we're only after their paths:
+  var sources = gulp.src(['./app/scripts/*.js', './app/styles/*.css'], {read: false});
+
+  return target.pipe(inject(sources))
+    .pipe(gulp.dest('./app'));
+});
+```
+
+Now go to your terminal, create files on "app/scripts" and "app/styles" for test purposes and execute
+```sh
+touch app/scripts/test.js
+touch app/styles/test.css
+
+gulp gulp-inject
+```
+
+See the magic happens:
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <!-- inject:css -->
+    <link rel="stylesheet" href="/app/styles/test.css">
+    <!-- endinject -->
+  </head>
+  <body>
+    <!-- inject:js -->
+    <script src="/app/scripts/test.js"></script>
+    <!-- endinject -->
+  </body>
+</html>
+```
+
+Now, let's write another task to write the "third-partner" dependencies like "bootstrap" and "jquery".
+
+#### Writing the "wiredep" to inject "third-partner" depencencies
+> Wiredep looks on your "bower.json" file and makes a black-magic stuff to know which of these files is the "main" one of that library.
+> https://github.com/taptapship/wiredep
+
+Install it with npm
+```sh
+npm install --save wiredep
+```
+
+Add those "injection placeholders" on your html (just as from the previous "gulp-inject" task)
+```html
+<!-- bower:css -->
+<!-- endbower -->
+
+<!-- bower:js -->
+<!-- endbower -->
+```
+This way
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <!-- "wiredep-inject" task: -->
+    <!-- bower:css -->
+    <!-- endbower -->
+
+    <!-- "gulp-inject" task: -->
+    <!-- inject:css -->
+    <!-- endinject -->
+  </head>
+  <body>
+    <!-- "wiredep-inject" task: -->
+    <!-- bower:js -->
+    <!-- endbower -->
+
+    <!-- "gulp-inject" task: -->
+    <!-- inject:js -->
+    <!-- endinject -->
+  </body>
+</html>
+```
+
+Open the "gulpfile.js" and add the "wiredep-inject" task(by the way, it can be whatever the name you want)
+```js
+var wiredep = require('wiredep');
+
+gulp.task('wiredep-inject', function () {
+  wiredep({ src: 'app/index.html' });
+});
+```
+
+Now go to your terminal and run
+```sh
+gulp wiredep-inject
+```
+
+See the magic happens:
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <!-- "wiredep-inject" task: -->
+    <!-- bower:css -->
+    <link rel="stylesheet" href="bower_components/bootstrap-css/css/bootstrap.min.css" />
+    <!-- endbower -->
+
+    <!-- "gulp-inject" task: -->
+    <!-- inject:css -->
+    <link rel="stylesheet" href="/app/styles/test.css">
+    <!-- endinject -->
+  </head>
+  <body>
+    <!-- "wiredep-inject" task: -->
+    <!-- bower:js -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="bower_components/bootstrap-css/js/bootstrap.min.js"></script>
+    <!-- endbower -->
+
+    <!-- "gulp-inject" task: -->
+    <!-- inject:js -->
+    <script src="/app/scripts/test.js"></script>
+    <!-- endinject -->
+  </body>
+</html>
+```
+
+#### Wire all those "inject" tasks together
+Open your "gulpfile.js" and write the "inject" task:
+```js
+gulp.task('inject',
+  [
+    'gulp-inject',
+    'wiredep-inject'
+  ]
+);
+```
+> Gulp depreciated the "gulp.run("task name") method, now we need to specify a task and send a array with the name of the tasks we want to run."
+
+Now go to your terminal and run
+```sh
+gulp inject
+```
+
+We expect a output like this
+```sh
+...
+[00:47:22] Starting 'gulp-inject'...
+[00:47:22] Starting 'wiredep-inject'...
+[00:47:22] Finished 'wiredep-inject' after 35 ms
+[00:47:22] gulp-inject 2 files into index.html.
+[00:47:22] Finished 'gulp-inject' after 98 ms
+[00:47:22] Starting 'inject'...
+[00:47:22] Finished 'inject' after 51 μs
+```
+
+Now we run two separated tasks in only one! :)
+
+#### TODO
+Next steps.
