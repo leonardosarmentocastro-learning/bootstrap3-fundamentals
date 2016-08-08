@@ -1,0 +1,21 @@
+{
+  "name": "bootstrap3-fundamentals",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "Leonardo Sarmento de Castro <leonardo.sarmentocastro@gmail.com>"
+  ],
+  "license": "ISC",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "jquery": "^3.1.0"
+  }
+}
