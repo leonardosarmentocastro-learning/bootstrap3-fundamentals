@@ -1,3 +1,7 @@
+### References
+[Codeguide](http://codeguide.co/)
+
+
 ### Recommended tools for this guide
 IDE:
   [Atom]()
@@ -11,13 +15,14 @@ Software versioning:
 ### Required global modules
 ```sh
 npm install -g bower
+npm install --global gulp-cli
 ```
 
 ### Stuff used
-- bower (as package manager)
-- gulp (boring tasks automatization)
-  - gulp-inject (used to inject our application css/js files automatically on "index.html")
-  - wiredep (used to inject our bower_components css/js files automatically)
+- [bower](https://bower.io/) (as package manager)
+- [gulp.js](http://gulpjs.com/) (boring tasks automatization)
+  - [gulp-inject](https://github.com/klei/gulp-inject) (used to inject our application css/js files automatically on "index.html")
+  - [wiredep](https://github.com/taptapship/wiredep) (used to inject our bower_components css/js files automatically)
 
 
 ### Step-by-step guide
@@ -394,4 +399,6 @@ We expect a output like this
 Now we run two separated tasks in only one! :)
 
 #### TODO
-Next steps.
+Next steps:
+Try making this for my personal website and write a guide to it
+- http://expo.getbootstrap.com/
